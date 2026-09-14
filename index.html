@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#17324d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="觀察旅伴" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <title>觀察旅伴｜旅行 × 展覽觀察引導</title>
+  <style>
+    :root{--bg:#f5f7f8;--card:#fff;--ink:#17202a;--muted:#6b7280;--brand:#17324d;--accent:#d97706;--line:#e5e7eb;--soft:#eef4f7;--danger:#9b2c2c}
+    *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;background:var(--bg);color:var(--ink)}
+    header{position:sticky;top:0;z-index:5;background:rgba(245,247,248,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .wrap{max-width:820px;margin:auto;padding:16px}.brand{display:flex;justify-content:space-between;gap:12px;align-items:center}.brand h1{font-size:20px;margin:0}.brand small{color:var(--muted)}
+    .tabs{display:flex;gap:8px;overflow:auto;padding:12px 0 2px}.tab,.chip,.btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;font-size:14px;white-space:nowrap}.tab.active,.chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+    main{padding-bottom:96px}.panel{display:none}.panel.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:14px 0;box-shadow:0 4px 18px rgba(15,23,42,.04)}
+    h2{font-size:18px;margin:0 0 8px}h3{font-size:16px;margin:0 0 8px}.muted{color:var(--muted);font-size:14px;line-height:1.55}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.mode{padding:18px;border-radius:16px;border:1px solid var(--line);background:#fff;text-align:left}.mode strong{display:block;margin-bottom:4px}.mode.active{outline:2px solid var(--brand);background:var(--soft)}
+    label{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;background:#fff;padding:11px 12px;font:inherit;color:var(--ink)}textarea{min-height:88px;resize:vertical}.btn{cursor:pointer}.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand);border-radius:12px}.btn.ghost{border-radius:12px}.btn.danger{color:var(--danger);border-radius:12px}.row{display:flex;gap:8px;flex-wrap:wrap}.row .btn{flex:1}.prompt{border-left:4px solid var(--accent);padding:10px 12px;background:#fff8ec;border-radius:10px;margin:9px 0;line-height:1.5}.list-item{padding:13px 0;border-bottom:1px solid var(--line)}.list-item:last-child{border:0}.tag{display:inline-block;font-size:12px;background:var(--soft);padding:4px 8px;border-radius:999px;margin-right:5px}.empty{text-align:center;padding:30px 10px;color:var(--muted)}
+    .five{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.five .chip{padding:8px 6px;text-align:center;font-size:12px}.summary{white-space:pre-wrap;line-height:1.7;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:12px}.footer-note{font-size:12px;color:var(--muted);text-align:center;margin:20px 0}.count{font-variant-numeric:tabular-nums;font-weight:700}
+    @media(max-width:580px){.wrap{padding:14px}.grid{grid-template-columns:1fr}.five{grid-template-columns:repeat(3,1fr)}.brand{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+<header><div class="wrap"><div class="brand"><div><h1>觀察旅伴</h1><small>Travel × Expo Observation Guide</small></div><small id="saveState">本機自動儲存</small></div><nav class="tabs">
+<button class="tab active" data-tab="guide">引導</button><button class="tab" data-tab="note">記錄</button><button class="tab" data-tab="memory">記憶庫</button><button class="tab" data-tab="review">回顧</button><button class="tab" data-tab="about">使用方式</button>
+</nav></div></header>
+<main class="wrap">
+<section id="guide" class="panel active">
+  <div class="card"><h2>今天要怎麼觀察？</h2><p class="muted">不是把行程塞滿，而是學會看見：人、城市、體驗、系統，以及你自己。</p><div class="grid"><button class="mode active" data-mode="travel"><strong>🧭 旅行模式</strong><span class="muted">People / Place / Things / Ideas / Me</span></button><button class="mode" data-mode="expo"><strong>🏛️ 展覽／參訪模式</strong><span class="muted">問題 → 技術 → 落地 → 治理</span></button></div></div>
+  <div class="card"><h2 id="guideTitle">旅行觀察鏡頭</h2><div id="prompts"></div><div class="row"><button class="btn primary" onclick="goTab('note')">開始記一筆</button><button class="btn ghost" onclick="randomPrompt()">隨機給我一題</button></div></div>
+</section>
+
+<section id="note" class="panel">
+  <div class="card"><h2>新增觀察</h2><p class="muted">先記「看到什麼」，再寫「怎麼解讀」。把事實和推論分開。</p>
+    <label>模式</label><select id="mode"><option value="travel">旅行</option><option value="expo">展覽／參訪</option></select>
+    <label>類別</label><select id="category"></select>
+    <label>標題</label><input id="title" placeholder="例如：韓國阿嬤直接幫我移包包的線" />
+    <label>我看到的｜What I saw</label><textarea id="seen" placeholder="只寫可觀察到的事實、場景、對話。"></textarea>
+    <label>我的解讀｜My interpretation</label><textarea id="interpretation" placeholder="我怎麼理解？這讓我想到什麼？"></textarea>
+    <label>我還不確定的｜What I am not sure about</label><textarea id="uncertain" placeholder="哪些地方只是猜測？有沒有其他可能？"></textarea>
+    <label>下次怎麼驗證｜How to verify</label><textarea id="verify" placeholder="問當地人、看另一個城市、查資料、再觀察一次……"></textarea>
+    <label>可帶回哪裡？</label><input id="transfer" placeholder="工作／研究／生活／人際／IG／寫作……" />
+    <div class="row" style="margin-top:14px"><button class="btn primary" onclick="saveNote()">儲存觀察</button><button class="btn ghost" onclick="clearForm()">清空</button></div>
+  </div>
+</section>
+
+<section id="memory" class="panel">
+  <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><h2>我的記憶庫</h2><div class="muted">已儲存 <span class="count" id="count">0</span> 筆</div></div><button class="btn ghost" onclick="exportJSON()">匯出備份</button></div>
+    <label>篩選</label><div class="five" id="filters"></div><div id="notes"></div>
+  </div>
+</section>
+
+<section id="review" class="panel">
+  <div class="card"><h2>旅程／參訪結束後</h2><p class="muted">把零散觀察收斂成能留下來的東西。</p>
+    <label>最意外的是什麼？</label><textarea id="r1"></textarea>
+    <label>哪個原本的想像被推翻？</label><textarea id="r2"></textarea>
+    <label>哪個問題還沒有答案？</label><textarea id="r3"></textarea>
+    <label>哪件事可以帶回工作／研究？</label><textarea id="r4"></textarea>
+    <label>我更了解自己什麼？</label><textarea id="r5"></textarea>
+    <label>值得跟朋友分享的故事？</label><textarea id="r6"></textarea>
+    <label>值得跟主管／教授分享的觀察？</label><textarea id="r7"></textarea>
+    <div class="row" style="margin-top:14px"><button class="btn primary" onclick="makeSummary()">產生回顧摘要</button><button class="btn ghost" onclick="saveReview()">儲存回顧</button></div>
+    <div id="reviewOut" class="summary" style="display:none;margin-top:14px"></div>
+  </div>
+</section>
+
+<section id="about" class="panel">
+  <div class="card"><h2>使用方法</h2><p class="muted">出發前看 2–3 題；現場只記關鍵字；晚上整理 1–3 筆；旅程結束再做一次回顧。不要試圖把所有東西都記下來。</p>
+    <div class="prompt"><strong>旅行：</strong>People 人｜Place 城市｜Things 體驗｜Ideas 想法｜Me 自己</div>
+    <div class="prompt"><strong>展覽：</strong>Problem 問題｜User 使用者｜Tech 技術｜Evidence 證據｜Limits 限制｜Owner 責任｜Cost 成本｜Pilot 實證｜Scale 規模化｜Transfer 轉移</div>
+    <div class="prompt"><strong>最重要的四格：</strong><br>我看到的 → 我的解讀 → 我還不確定的 → 下次怎麼驗證</div>
+    <h3 style="margin-top:18px">iPhone 當 App 使用</h3><p class="muted">部署到 GitHub Pages 後，用 Safari 開啟網站 → 分享 → 加入主畫面。資料會存在目前瀏覽器的 Local Storage。</p>
+  </div><div class="footer-note">讓旅行不只留下照片，也留下可複利的觀察。</div>
+</section>
+</main>
+<script>
+const travelPrompts={
+  'People 人':['人和人說話的距離感如何？','陌生人遇到問題時怎麼互相幫忙？','不同世代有什麼互動差異？','服務人員怎麼回應外國人？','哪些行為讓你覺得有禮貌／沒禮貌？先描述行為，不急著評價。'],
+  'Place 城市':['這座城市晚上怎麼運作？','交通、住宅、商業彼此怎麼連接？','垃圾、廁所、座椅、無障礙做得如何？','哪裡讓你覺得安全／不安全？為什麼？','城市最明顯的聲音、氣味、風、光線是什麼？'],
+  'Things 體驗':['第一次吃／用／做什麼？和想像差在哪？','什麼體驗讓你最驚喜？','什麼事情很不習慣，但後來適應了？','哪些細節只有親自來才會知道？'],
+  'Ideas 想法':['哪個現象背後可能有制度原因？','你看到了什麼矛盾或反差？','哪些地方不能只靠一次經驗下結論？','如果要驗證這個印象，你會怎麼做？'],
+  'Me 自己':['什麼時候你最放鬆？','什麼時候你最焦慮或煩躁？','這趟旅程讓你發現自己喜歡什麼？','以前學過的什麼能力在這裡派上用場？','這趟旅程讓你開始問自己什麼問題？']
+};
+const expoPrompts={
+  'Problem 問題':['它到底解決什麼痛點？','沒有這個方案時，現在的人怎麼做？'],
+  'User 使用者':['真正使用的人是誰？','誰受益？誰可能反而增加負擔？'],
+  'Tech 技術':['感測器、資料、AI、平台、實體設備怎麼串？','核心技術是什麼？替代方案是什麼？'],
+  'Evidence 證據':['有沒有準確率、KPI、案例或實際部署證據？','這是 Demo、Pilot，還是正式營運？'],
+  'Limits 限制':['廠商願不願意講做不到什麼？','誤報、漏報、極端情境怎麼處理？'],
+  'Owner 責任':['誰收到警報？誰做最後決定？','出錯時誰負責？人工覆核在哪裡？'],
+  'Cost 成本':['誰付錢？','建置之外，維護、人力、資安、升級成本呢？'],
+  'Pilot 實證':['如何小規模試驗？','成功標準是什麼？停止條件是什麼？'],
+  'Scale 規模化':['能不能跨場域、跨城市複製？','需要哪些資料標準、API、治理制度？'],
+  'Transfer 轉移':['這個概念能帶回我的工作／研究嗎？','如果移植到另一個場景，需要改什麼？']
+};
+let guideMode=localStorage.getItem('guideMode')||'travel';
+let notes=JSON.parse(localStorage.getItem('obsNotes')||'[]');
+let filter='全部';
+const $=id=>document.getElementById(id);
+function goTab(id){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));if(id==='memory')renderNotes();}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>goTab(b.dataset.tab));
+document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{guideMode=b.dataset.mode;localStorage.setItem('guideMode',guideMode);document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('active',x.dataset.mode===guideMode));$('mode').value=guideMode;renderGuide();renderCategories();});
+function dict(){return guideMode==='travel'?travelPrompts:expoPrompts}
+function renderGuide(){document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('active',x.dataset.mode===guideMode));$('guideTitle').textContent=guideMode==='travel'?'旅行觀察鏡頭':'展覽／參訪觀察鏡頭';$('prompts').innerHTML=Object.entries(dict()).map(([k,v])=>`<div class="prompt"><strong>${k}</strong><br>${v.slice(0,2).join('<br>')}</div>`).join('');}
+function randomPrompt(){const all=Object.entries(dict()).flatMap(([k,v])=>v.map(q=>[k,q]));const [k,q]=all[Math.floor(Math.random()*all.length)];alert(`${k}\n\n${q}`)}
+function renderCategories(){const d=$('mode').value==='travel'?travelPrompts:expoPrompts;$('category').innerHTML=Object.keys(d).map(k=>`<option>${k}</option>`).join('');}
+$('mode').onchange=renderCategories;
+function saveNote(){const n={id:Date.now(),date:new Date().toISOString(),mode:$('mode').value,category:$('category').value,title:$('title').value.trim()||'未命名觀察',seen:$('seen').value.trim(),interpretation:$('interpretation').value.trim(),uncertain:$('uncertain').value.trim(),verify:$('verify').value.trim(),transfer:$('transfer').value.trim()};if(!n.seen&&!n.interpretation){alert('至少寫下「我看到的」或「我的解讀」。');return}notes.unshift(n);localStorage.setItem('obsNotes',JSON.stringify(notes));$('saveState').textContent='已儲存 ✓';setTimeout(()=>$('saveState').textContent='本機自動儲存',1200);clearForm();renderNotes();goTab('memory');}
+function clearForm(){['title','seen','interpretation','uncertain','verify','transfer'].forEach(x=>$(x).value='')}
+function esc(s=''){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function renderFilters(){const cats=['全部',...new Set(notes.map(n=>n.category))];$('filters').innerHTML=cats.map(c=>`<button class="chip ${filter===c?'active':''}" onclick="setFilter('${c.replaceAll("'","\\'")}')">${esc(c)}</button>`).join('')}
+function setFilter(c){filter=c;renderNotes()}
+function renderNotes(){renderFilters();const arr=filter==='全部'?notes:notes.filter(n=>n.category===filter);$('count').textContent=notes.length;$('notes').innerHTML=arr.length?arr.map(n=>`<div class="list-item"><div><span class="tag">${esc(n.category)}</span><span class="tag">${n.mode==='travel'?'旅行':'展覽'}</span></div><h3 style="margin-top:8px">${esc(n.title)}</h3>${n.seen?`<div class="muted"><strong>看到：</strong>${esc(n.seen)}</div>`:''}${n.interpretation?`<div class="muted"><strong>解讀：</strong>${esc(n.interpretation)}</div>`:''}${n.uncertain?`<div class="muted"><strong>不確定：</strong>${esc(n.uncertain)}</div>`:''}${n.verify?`<div class="muted"><strong>驗證：</strong>${esc(n.verify)}</div>`:''}<div style="margin-top:8px"><button class="btn danger" onclick="removeNote(${n.id})">刪除</button></div></div>`).join(''):'<div class="empty">還沒有觀察。今天先記一件真正讓你停下來的事。</div>'}
+function removeNote(id){if(confirm('刪除這筆觀察？')){notes=notes.filter(n=>n.id!==id);localStorage.setItem('obsNotes',JSON.stringify(notes));renderNotes()}}
+function exportJSON(){const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),notes,review:loadReview()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='observation-memory-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function reviewData(){return Object.fromEntries([1,2,3,4,5,6,7].map(i=>['r'+i,$('r'+i).value.trim()]))}
+function saveReview(){localStorage.setItem('obsReview',JSON.stringify(reviewData()));$('saveState').textContent='回顧已儲存 ✓';setTimeout(()=>$('saveState').textContent='本機自動儲存',1200)}
+function loadReview(){return JSON.parse(localStorage.getItem('obsReview')||'{}')}
+function makeSummary(){const r=reviewData();const lines=[['最意外',r.r1],['被推翻的想像',r.r2],['還沒答案的問題',r.r3],['可帶回工作／研究',r.r4],['更了解自己的地方',r.r5],['值得跟朋友分享',r.r6],['值得跟主管／教授分享',r.r7]].filter(x=>x[1]);$('reviewOut').textContent=lines.map(x=>`${x[0]}\n${x[1]}`).join('\n\n');$('reviewOut').style.display='block'}
+const savedReview=loadReview();Object.entries(savedReview).forEach(([k,v])=>{if($(k))$(k).value=v});
+renderGuide();$('mode').value=guideMode;renderCategories();renderNotes();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
